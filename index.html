@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Adopt Me — Value Companion</title>
+
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#1b1b1f">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="AM Values">
+
+<style>
+  :root {
+    --bg: #1b1b1f;
+    --panel: #24242b;
+    --accent: #7c9dff;
+    --accent2: #ffb86b;
+    --text: #eaeaf0;
+    --muted: #9a9aa5;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body {
+    margin: 0;
+    height: 100%;
+    font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+  }
+  body {
+    display: flex;
+    flex-direction: column;
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  header {
+    background: var(--panel);
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-bottom: 1px solid #33333c;
+    flex-wrap: wrap;
+  }
+  header h1 {
+    font-size: 15px;
+    margin: 0;
+    color: var(--accent2);
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  header h1 img { width: 20px; height: 20px; border-radius: 5px; }
+  nav {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    overflow-x: auto;
+  }
+  nav button {
+    background: #2f2f38;
+    color: var(--text);
+    border: 1px solid #3a3a45;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    white-space: nowrap;
+    transition: 0.15s;
+  }
+  nav button:hover { background: #3a3a45; }
+  nav button.active {
+    background: var(--accent);
+    color: #14141a;
+    border-color: var(--accent);
+    font-weight: 600;
+  }
+  .spacer { margin-left: auto; }
+  #installBtn {
+    display: none;
+    background: var(--accent2);
+    color: #14141a;
+    border: none;
+    padding: 7px 14px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .open-new {
+    font-size: 12px;
+    color: var(--muted);
+    text-decoration: none;
+    border: 1px solid #3a3a45;
+    padding: 6px 10px;
+    border-radius: 6px;
+  }
+  .open-new:hover { color: var(--text); border-color: var(--accent); }
+  iframe {
+    flex: 1;
+    width: 100%;
+    border: none;
+    background: #fff;
+  }
+  #status {
+    font-size: 11px;
+    color: var(--muted);
+    padding: 4px 14px;
+    background: var(--panel);
+    border-top: 1px solid #33333c;
+  }
+  #iosHint {
+    display: none;
+    position: fixed;
+    left: 12px; right: 12px; bottom: 40px;
+    background: var(--panel);
+    border: 1px solid var(--accent);
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-size: 13px;
+    line-height: 1.4;
+    box-shadow: 0 6px 24px rgba(0,0,0,.4);
+    z-index: 50;
+  }
+  #iosHint button {
+    margin-top: 8px;
+    background: var(--accent);
+    color: #14141a;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1><img src="icon-192.png" alt=""> AM Companion</h1>
+  <nav id="tabs">
+    <button data-url="https://amvgg.com/values/pets" class="active">Питомцы</button>
+    <button data-url="https://amvgg.com/calculator">WFL</button>
+    <button data-url="https://amvgg.com/trades">Трейды</button>
+    <button data-url="https://amvgg.com/values/eggs">Яйца</button>
+    <button data-url="https://amvgg.com/values/petwear">Одежда</button>
+    <button data-url="https://amvgg.com/value-updates">Обновления</button>
+  </nav>
+  <span class="spacer"></span>
+  <button id="installBtn">📲 Установить</button>
+  <a class="open-new" id="openNew" href="https://amvgg.com/values/pets" target="_blank" rel="noopener">Открыть в браузере ↗</a>
+</header>
+
+<iframe id="frame" src="https://amvgg.com/values/pets" title="amvgg.com"></iframe>
+<div id="status">Держите приложение открытым рядом с Roblox во время трейда.</div>
+
+<div id="iosHint">
+  Чтобы установить на iPhone/iPad: нажмите <b>Поделиться</b> (значок ⬆️ внизу Safari) →
+  <b>«На экран “Домой”»</b>.
+  <br><button onclick="document.getElementById('iosHint').style.display='none'">Понятно</button>
+</div>
+
+<script>
+  const tabs = document.querySelectorAll('#tabs button');
+  const frame = document.getElementById('frame');
+  const openNew = document.getElementById('openNew');
+  const status = document.getElementById('status');
+
+  tabs.forEach(btn => {
+    btn.addEventListener('click', () => {
+      tabs.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const url = btn.dataset.url;
+      frame.src = url;
+      openNew.href = url;
+      status.textContent = 'Загрузка: ' + url;
+    });
+  });
+
+  // Регистрация service worker (нужен HTTPS или localhost)
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('sw.js').catch(() => {});
+    });
+  }
+
+  // Установка на Android/desktop Chrome/Edge
+  let deferredPrompt;
+  const installBtn = document.getElementById('installBtn');
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    installBtn.style.display = 'inline-block';
+  });
+  installBtn.addEventListener('click', async () => {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    await deferredPrompt.userChoice;
+    deferredPrompt = null;
+    installBtn.style.display = 'none';
+  });
+  window.addEventListener('appinstalled', () => {
+    installBtn.style.display = 'none';
+  });
+
+  // Подсказка для iOS (Safari не поддерживает beforeinstallprompt)
+  const isIos = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  const isStandalone = window.navigator.standalone === true ||
+    window.matchMedia('(display-mode: standalone)').matches;
+  if (isIos && !isStandalone) {
+    setTimeout(() => { document.getElementById('iosHint').style.display = 'block'; }, 1200);
+  }
+</script>
+
+</body>
+</html>
